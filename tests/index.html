@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ExoSky - Mapa Estelar 3D</title>
+  <style>
+    body { margin: 0; overflow: hidden; background-color: #000; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      z-index: 1;
+    }
+    #backButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+      z-index: 1;
+    }
+    #backButton:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="info">Clique em um planeta para ver o céu de sua perspectiva.</div>
+  <button id="backButton">Voltar</button>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    let scene, camera, renderer;
+    let stars = [];
+    let planets = [];
+    let currentView = 'main';
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => {
+        planets = data.planets;
+        init();
+      });
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 100;
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      scene.add(ambientLight);
+
+      addMainStars();
+      addPlanets();
+
+      window.addEventListener('resize', onWindowResize, false);
+      window.addEventListener('click', onClick, false);
+      window.addEventListener('mousedown', onMouseDown, false);
+      window.addEventListener('mouseup', onMouseUp, false);
+      window.addEventListener('mousemove', onMouseMove, false);
+
+      animate();
+    }
+
+    function addMainStars() {
+      for (let i = 0; i < 500; i++) {
+        let starGeometry = new THREE.SphereGeometry(0.5, 24, 24);
+        let starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        let star = new THREE.Mesh(starGeometry, starMaterial);
+
+        star.position.x = (Math.random() - 0.5) * 500;
+        star.position.y = (Math.random() - 0.5) * 500;
+        star.position.z = (Math.random() - 0.5) * 500;
+
+        let brightness = Math.random() * 0.5 + 0.5;
+        star.scale.set(brightness, brightness, brightness);
+        star.material.opacity = Math.random() * 0.5 + 0.5;
+        star.material.transparent = true;
+
+        scene.add(star);
+        stars.push(star);
+      }
+    }
+
+    function addPlanets() {
+      planets.forEach((planet) => {
+        let planetGeometry = new THREE.SphereGeometry(5, 32, 32);
+        let planetMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        let planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+
+        planetMesh.position.set(planet.position.x, planet.position.y, planet.position.z);
+        planetMesh.name = planet.name;
+        scene.add(planetMesh);
+      });
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function onClick(event) {
+      event.preventDefault();
+      const mouse = new THREE.Vector2();
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+      const selectedPlanet = intersects.find(obj => planets.map(p => p.name).includes(obj.object.name));
+      if (selectedPlanet) {
+        showPlanetView(selectedPlanet.object);
+      }
+    }
+
+    function showPlanetView(planet) {
+      currentView = 'planet';
+      document.getElementById('info').style.display = 'none';
+      document.getElementById('backButton').style.display = 'block';
+      scene.clear();
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      scene.add(ambientLight);
+      const planetInfo = planets.find(p => p.name === planet.name);
+      planetInfo.stars.forEach(star => {
+        let starGeometry = new THREE.SphereGeometry(0.3, 12, 12);
+        let starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        let starMesh = new THREE.Mesh(starGeometry, starMaterial);
+
+        starMesh.position.set(star.position.x, star.position.y, star.position.z);
+        starMesh.scale.set(star.brightness, star.brightness, star.brightness);
+        scene.add(starMesh);
+      });
+      let planetGeometry = new THREE.SphereGeometry(5, 32, 32);
+      let planetMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+      let planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+      planetMesh.position.set(0, 0, 0);
+      scene.add(planetMesh);
+      camera.position.set(0, 0, 20);
+    }
+
+    document.getElementById('backButton').addEventListener('click', () => {
+      currentView = 'main';
+      document.getElementById('info').style.display = 'block';
+      document.getElementById('backButton').style.display = 'none';
+      scene.clear();
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      scene.add(ambientLight);
+      addMainStars();
+      addPlanets();
+      camera.position.set(0, 0, 100);
+    });
+
+    function onMouseDown(event) {
+      isDragging = true;
+      previousMousePosition = { x: event.clientX, y: event.clientY };
+    }
+
+    function onMouseUp() {
+      isDragging = false;
+    }
+
+    function onMouseMove(event) {
+      if (!isDragging) return;
+      const deltaMove = {
+        x: event.clientX - previousMousePosition.x,
+        y: event.clientY - previousMousePosition.y
+      };
+      camera.rotation.y += deltaMove.x * 0.005;
+      camera.rotation.x += deltaMove.y * 0.005;
+      previousMousePosition = { x: event.clientX, y: event.clientY };
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (currentView === 'main') {
+        scene.rotation.y += 0.0005;
+      }
+      renderer.render(scene, camera);
+    }
+
+  </script>
+</body>
+</html>

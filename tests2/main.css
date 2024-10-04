@@ -1,0 +1,17 @@
+/* main.css */
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#info {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    z-index: 100;
+    font-family: sans-serif;
+    user-select: none;
+}
