@@ -1,0 +1,81 @@
+body { 
+    margin: 0; 
+    overflow: hidden; 
+    background-color: #000; 
+    font-family: 'Roboto', sans-serif; 
+  }
+  
+  /* Painel de Informações */
+  #infoPanel {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    color: #fff;
+    max-width: 300px;
+    display: none;
+    z-index: 2;
+  }
+  
+  /* Botão de Voltar */
+  #backButton {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: none;
+    z-index: 1;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  #backButton:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  /* Painel de Constelação */
+  #constellationPanel {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    color: #fff;
+    max-width: 300px;
+    display: none;
+    z-index: 2;
+  }
+  
+  /* Input para Nome da Constelação */
+  #constellationInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  /* Botão de Download */
+  #downloadBtn {
+    padding: 10px 20px;
+    background-color: rgba(0, 245, 255, 0.2);
+    color: #00f5ff;
+    border: 2px solid #00f5ff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #downloadBtn:hover {
+    background-color: #00f5ff;
+    color: #000;
+  }
+  

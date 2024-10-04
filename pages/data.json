@@ -1,0 +1,26 @@
+{
+  "planets": [
+    {
+      "name": "Planeta Alpha",
+      "position": { "x": 50, "y": 0, "z": 0 },
+      "info": "Planeta Alpha é um exoplaneta rochoso com atmosfera rica em oxigênio.",
+      "stars": [
+        { "position": { "x": 10, "y": 5, "z": -15 }, "brightness": 1 },
+        { "position": { "x": -20, "y": 10, "z": 5 }, "brightness": 0.8 },
+        { "position": { "x": 15, "y": -5, "z": -10 }, "brightness": 1.2 },
+        { "position": { "x": -10, "y": -10, "z": 15 }, "brightness": 1.1 }
+      ]
+    },
+    {
+      "name": "Planeta Beta",
+      "position": { "x": -50, "y": 0, "z": 0 },
+      "info": "Planeta Beta é um gigante gasoso com tempestades intensas em sua superfície.",
+      "stars": [
+        { "position": { "x": 5, "y": 5, "z": 10 }, "brightness": 0.9 },
+        { "position": { "x": -15, "y": 10, "z": -5 }, "brightness": 1 },
+        { "position": { "x": 20, "y": -5, "z": 5 }, "brightness": 1.5 },
+        { "position": { "x": -10, "y": -10, "z": -15 }, "brightness": 0.7 }
+      ]
+    }
+  ]
+}
