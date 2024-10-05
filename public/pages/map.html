@@ -31,20 +31,23 @@
             margin-top: 10px;
             width: 100%;
         }
+
     </style>
 </head>
 <body>
     <div id="infoPanel">
         <h3>Informações da Estrela</h3>
         <div id="starInfo">Selecione uma estrela para ver os detalhes.</div>
-        <button id="enterExoplanet" style="display: none;">Entrar no Exoplaneta</button>
     </div>
     <div id="leftPanel">
         <button id="backButton">Voltar</button>
         <button id="downloadButton">Download</button>
     </div>
+    <!-- Incluindo as bibliotecas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="Estrela.js"></script> <!-- Importa a classe Estrela -->
+    <script src="https://cdn.jsdelivr.net/npm/simplex-noise/simplex-noise.js"></script>
+    <script src="Estrela.js"></script> <!-- Inclui a classe Estrela -->
+    
     <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -56,6 +59,7 @@
         let estrelaSelecionada = null;
         let estrelaEscolhidaParaConstelacao = null;
 
+        // Função para carregar estrelas do arquivo JSON
         async function carregarEstrelas() {
             const response = await fetch('estrelas.json');
             const data = await response.json();
@@ -124,7 +128,7 @@
                     const estrelaAtual = estrelas.find(estrela => estrela.mesh === intersects[0].object);
                     if (estrelaEscolhidaParaConstelacao === null) {
                         estrelaEscolhidaParaConstelacao = estrelaAtual;
-                        if (estrelaSelecionada) {
+                    if (estrelaSelecionada) {
                             estrelaSelecionada.deselecionar();
                         }
                         estrelaSelecionada = estrelaAtual;
@@ -191,6 +195,11 @@
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            window.addEventListener('wheel', (event) => {
+                camera.position.z += event.deltaY * 0.05; // Aumentando o fator de zoom
+                camera.position.z = Math.max(1, camera.position.z);
             });
         });
     </script>
