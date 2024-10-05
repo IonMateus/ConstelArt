@@ -1,388 +1,149 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>ExoSky - Mapa Estelar 3D</title>
-  <style>
-    body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Roboto', sans-serif; }
-    
-    /* Painel de Informações */
-    #infoPanel {
-      position: absolute;
-      top: 50px;
-      left: 20px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 10px;
-      color: #fff;
-      max-width: 300px;
-      display: none;
-      z-index: 2;
-    }
-
-    /* Botão de Voltar */
-    #backButton {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      display: none;
-      z-index: 1;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-    #backButton:hover {
-      background-color: rgba(255, 255, 255, 0.4);
-    }
-
-    /* Painel de Constellation */
-    #constellationPanel {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 10px;
-      color: #fff;
-      max-width: 300px;
-      display: none;
-      z-index: 2;
-    }
-
-    /* Input para Nome da Constelação */
-    #constellationInput {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 5px;
-    }
-
-    /* Botão de Download */
-    #downloadBtn {
-      padding: 10px 20px;
-      background-color: rgba(0, 245, 255, 0.2);
-      color: #00f5ff;
-      border: 2px solid #00f5ff;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    #downloadBtn:hover {
-      background-color: #00f5ff;
-      color: #000;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Estelar 3D</title>
+    <style>
+        body { margin: 0; display: flex; }
+        canvas { display: block; }
+        #infoPanel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
-  <div id="infoPanel"></div>
-  <button id="backButton">Voltar</button>
-  <div id="constellationPanel">
-    <input type="text" id="constellationInput" placeholder="Nome da Constelação">
-    <button id="downloadBtn">Baixar Constelação</button>
-  </div>
-  
-  <!-- Three.js via CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- OrbitControls via CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
-  
-  <script>
-    let scene, camera, renderer, controls;
-    let raycaster = new THREE.Raycaster();
-    let mouse = new THREE.Vector2();
-    let planets = [];
-    let stars = [];
-    let selectedPlanet = null;
-    let constellationLines = [];
-    let selectedStarsForConstellation = [];
-    let constellationName = "";
-    let constellationImage;
+    <div id="infoPanel">
+        <h3>Informações da Estrela</h3>
+        <div id="starInfo">Selecione uma estrela para ver os detalhes.</div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="Estrela.js"></script> <!-- Importa a classe Estrela -->
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    // Painéis
-    const infoPanel = document.getElementById('infoPanel');
-    const backButton = document.getElementById('backButton');
-    const constellationPanel = document.getElementById('constellationPanel');
-    const constellationInput = document.getElementById('constellationInput');
-    const downloadBtn = document.getElementById('downloadBtn');
+        const estrelas = [];
 
-    // Carregar dados dos planetas
-    fetch('data.json')
-      .then(response => response.json())
-      .then(data => {
-        planets = data.planets;
-        init();
-      })
-      .catch(error => {
-        console.error('Erro ao carregar data.json:', error);
-      });
+        // Função para carregar estrelas do arquivo JSON
+        async function carregarEstrelas() {
+            const response = await fetch('estrelas.json');
+            const data = await response.json();
 
-    function init() {
-      // Cena
-      scene = new THREE.Scene();
-
-      // Câmera
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.z = 100;
-
-      // Renderizador
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      document.body.appendChild(renderer.domElement);
-
-      // Controles de Órbita
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-
-      // Luz
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-      scene.add(ambientLight);
-
-      // Adicionar estrelas principais
-      addMainStars();
-
-      // Adicionar planetas
-      addPlanets();
-
-      // Eventos
-      window.addEventListener('resize', onWindowResize, false);
-      window.addEventListener('pointerdown', onPointerDown, false);
-      window.addEventListener('mousemove', onPointerMove, false);
-      backButton.addEventListener('click', onBackButtonClick, false);
-      downloadBtn.addEventListener('click', downloadConstellation, false);
-
-      animate();
-    }
-
-    function addMainStars() {
-      for (let i = 0; i < 500; i++) {
-        let starGeometry = new THREE.SphereGeometry(0.5, 24, 24);
-        let starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        let star = new THREE.Mesh(starGeometry, starMaterial);
-
-        star.position.x = (Math.random() - 0.5) * 1000;
-        star.position.y = (Math.random() - 0.5) * 1000;
-        star.position.z = (Math.random() - 0.5) * 1000;
-
-        let brightness = Math.random() * 0.5 + 0.5;
-        star.scale.set(brightness, brightness, brightness);
-        star.material.opacity = Math.random() * 0.5 + 0.5;
-        star.material.transparent = true;
-
-        scene.add(star);
-        stars.push(star);
-      }
-    }
-
-    function addPlanets() {
-      const planetGeometry = new THREE.SphereGeometry(5, 32, 32);
-      const planetMaterial = new THREE.MeshStandardMaterial({ color: 0x00f5ff });
-      
-      planets.forEach((planetData) => {
-        let planet = new THREE.Mesh(planetGeometry, planetMaterial.clone());
-        planet.position.set(planetData.position.x, planetData.position.y, planetData.position.z);
-        planet.name = planetData.name;
-        planet.userData.info = planetData.info;
-        scene.add(planet);
-      });
-    }
-
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    function onPointerMove(event) {
-      // Atualizar posição do mouse
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-      // Raycaster para hover
-      raycaster.setFromCamera(mouse, camera);
-      let intersects = raycaster.intersectObjects(planets);
-
-      // Resetar escala de todos os planetas
-      planets.forEach((planetData) => {
-        let planet = scene.getObjectByName(planetData.name);
-        planet.scale.set(1, 1, 1);
-      });
-
-      if (intersects.length > 0) {
-        let hoveredPlanet = intersects[0].object;
-        hoveredPlanet.scale.set(1.3, 1.3, 1.3); // Aumentar tamanho
-      }
-    }
-
-    function onPointerDown(event) {
-      // Atualizar posição do mouse
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-      // Raycaster para cliques
-      raycaster.setFromCamera(mouse, camera);
-      let intersects = raycaster.intersectObjects(planets.concat(stars));
-
-      if (intersects.length > 0) {
-        let intersected = intersects[0].object;
-
-        if (planets.map(p => p.name).includes(intersected.name)) {
-          // Clique em um planeta
-          selectPlanet(intersected);
-        } else if (currentView === 'planet' && intersected.geometry.type === 'SphereGeometry') {
-          // Clique em uma estrela dentro de um planeta
-          selectStar(intersected, event);
+            data.forEach(item => {
+                const estrela = new Estrela(item.x, item.y, item.z, item.tamanho);
+                estrelas.push(estrela);
+                scene.add(estrela.mesh);
+            });
         }
-      }
-    }
 
-    function selectPlanet(planet) {
-      if (selectedPlanet === planet) return; // Já está selecionado
+        carregarEstrelas().then(() => {
+            camera.position.z = 20; // Aumentando a distância inicial da câmera
 
-      selectedPlanet = planet;
-      controls.enabled = false;
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let estrelaSelecionada = null;
 
-      // Mostrar painel de informações
-      infoPanel.style.display = 'block';
-      infoPanel.innerHTML = `<h2>${planet.name}</h2><p>${planet.userData.info}</p>`;
+            document.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
 
-      // Mostrar botão de voltar
-      backButton.style.display = 'block';
+            document.addEventListener('mousedown', (event) => {
+                // Raycaster para interação ao clicar
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
 
-      // Mover a câmera para perto do planeta
-      new TWEEN.Tween(camera.position)
-        .to({
-          x: planet.position.x,
-          y: planet.position.y,
-          z: planet.position.z + 20
-        }, 1000)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(() => {
-          camera.lookAt(planet.position);
-        })
-        .start();
-    }
+                if (intersects.length > 0) {
+                    if (estrelaSelecionada) {
+                        estrelaSelecionada.deselecionar(); // Desseleciona a estrela anterior
+                    }
 
-    function onBackButtonClick() {
-      if (!selectedPlanet) return;
+                    estrelaSelecionada = estrelas.find(estrela => estrela.mesh === intersects[0].object);
+                    estrelaSelecionada.selecionar(); // Seleciona a nova estrela
+                    mostrarInformacoes(estrelaSelecionada);
+                }
+            });
 
-      // Ocultar painel de informações
-      infoPanel.style.display = 'none';
+            function mostrarInformacoes(estrela) {
+                const infoPanel = document.getElementById('starInfo');
+                infoPanel.innerHTML = `
+                    <strong>Posição:</strong> (${estrela.x.toFixed(2)}, ${estrela.y.toFixed(2)}, ${estrela.z.toFixed(2)})<br>
+                    <strong>Tamanho:</strong> ${estrela.tamanho}<br>
+                `;
+            }
 
-      // Ocultar botão de voltar
-      backButton.style.display = 'none';
+            let isMouseDown = false;
+            let previousMousePosition = { x: 0, y: 0 };
 
-      // Habilitar controles novamente
-      controls.enabled = true;
+            document.addEventListener('mousedown', (event) => {
+                isMouseDown = true;
+            });
 
-      // Voltar a câmera para a posição inicial
-      new TWEEN.Tween(camera.position)
-        .to({ z: 100 }, 1000)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(() => {
-          camera.lookAt(scene.position);
-        })
-        .onComplete(() => {
-          selectedPlanet = null;
-        })
-        .start();
+            document.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
 
-      // Limpar constelações e linhas
-      clearConstellations();
-    }
+            document.addEventListener('mousemove', (event) => {
+                if (isMouseDown) {
+                    const deltaMove = {
+                        x: event.offsetX - previousMousePosition.x,
+                        y: event.offsetY - previousMousePosition.y
+                    };
 
-    function selectStar(star, event) {
-      if (selectedStarsForConstellation.length < 2) {
-        selectedStarsForConstellation.push(star);
-        highlightStar(star);
-      }
+                    const deltaRotationQuaternion = new THREE.Quaternion()
+                        .setFromEuler(new THREE.Euler(
+                            deltaMove.y * 0.01,
+                            deltaMove.x * 0.01,
+                            0,
+                            'XYZ'
+                        ));
 
-      if (selectedStarsForConstellation.length === 2) {
-        // Desenhar linha entre as estrelas
-        let material = new THREE.LineBasicMaterial({ color: 0x00f5ff });
-        let points = [];
-        points.push(selectedStarsForConstellation[0].position);
-        points.push(selectedStarsForConstellation[1].position);
-        let geometry = new THREE.BufferGeometry().setFromPoints(points);
-        let line = new THREE.Line(geometry, material);
-        scene.add(line);
-        constellationLines.push(line);
+                    camera.quaternion.multiplyQuaternions(deltaRotationQuaternion, camera.quaternion);
+                }
 
-        // Mostrar painel para nomear constelação
-        constellationPanel.style.display = 'block';
-      }
-    }
+                previousMousePosition = {
+                    x: event.offsetX,
+                    y: event.offsetY
+                };
+            });
 
-    function highlightStar(star) {
-      star.material.color.set(0xff0000); // Alterar cor para destacar
-      setTimeout(() => {
-        star.material.color.set(0xffffff);
-      }, 500);
-    }
+            function animate() {
+                requestAnimationFrame(animate);
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
 
-    function downloadConstellation() {
-      constellationName = constellationInput.value.trim();
-      if (constellationName === "") {
-        alert("Por favor, insira um nome para a constelação.");
-        return;
-      }
+                estrelas.forEach(estrela => estrela.voltarTamanho());
+                if (intersects.length > 0) {
+                    intersects[0].object.scale.set(1.5, 1.5, 1.5);
+                }
 
-      // Adicionar texto ao canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const context = canvas.getContext('2d');
-      context.fillStyle = "#000000";
-      context.fillRect(0, 0, canvas.width, canvas.height);
+                renderer.render(scene, camera);
+            }
 
-      // Renderizar a cena para o canvas
-      renderer.render(scene, camera);
-      context.drawImage(renderer.domElement, 0, 0);
+            animate();
 
-      // Adicionar nome da constelação
-      context.font = "30px Arial";
-      context.fillStyle = "#00f5ff";
-      context.fillText(constellationName, 50, 50);
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
-      // Criar imagem e baixar
-      const link = document.createElement('a');
-      link.download = `${constellationName}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-
-      // Resetar painel e seleção
-      constellationPanel.style.display = 'none';
-      selectedStarsForConstellation = [];
-      constellationInput.value = "";
-    }
-
-    function clearConstellations() {
-      constellationLines.forEach(line => scene.remove(line));
-      constellationLines = [];
-      constellationPanel.style.display = 'none';
-      selectedStarsForConstellation = [];
-    }
-
-    function animate(time) {
-      requestAnimationFrame(animate);
-
-      TWEEN.update(time);
-
-      controls.update();
-      renderer.render(scene, camera);
-    }
-  </script>
-  
-  <!-- Tween.js para animações de câmera -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+            window.addEventListener('wheel', (event) => {
+                camera.position.z += event.deltaY * 0.05; // Aumentando o fator de zoom
+                camera.position.z = Math.max(1, camera.position.z);
+            });
+        });
+    </script>
 </body>
 </html>
