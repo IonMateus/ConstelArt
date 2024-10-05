@@ -1,0 +1,28 @@
+{
+  "name": "tests4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "dev": "nodemon server.js",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tweenjs/tween.js": "^25.0.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "express": "^4.21.0",
+    "html-webpack-plugin": "^5.6.0",
+    "nodemon": "^3.1.7",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.11.1"
+  }
+}
