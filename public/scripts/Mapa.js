@@ -258,34 +258,120 @@ carregarEstrelas().then(() => {
         ).multiplyScalar(0.5);
     }
 
+    let moveForward = false;
+let moveBackward = false;
+let moveLeft = false;
+let moveRight = false;
+const moveSpeed = 0.1; // Velocidade de movimento da câmera
 
-    function animate() {
-        requestAnimationFrame(animate);
-
-        // Movimento suave de zoom
-        const direction = new THREE.Vector3();
-        camera.getWorldDirection(direction);
-        direction.multiplyScalar(zoomSpeed);
-        camera.position.add(direction);
-
-        // Limitar a distância de zoom
-        const distance = camera.position.length();
-        if (distance < 1) {
-            camera.position.setLength(1);
-        }
-
-        zoomSpeed *= 0.9; // Reduzir a velocidade do zoom ao longo do tempo
-
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
-
-        estrelas.forEach(estrela => estrela.voltarTamanho());
-        if (intersects.length > 0) {
-            intersects[0].object.scale.set(1.5, 1.5, 1.5);
-        }
-
-        renderer.render(scene, camera);
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case 'w':
+        case 'W':
+            moveForward = true;
+            break;
+        case 's':
+        case 'S':
+            moveBackward = true;
+            break;
+        case 'a':
+        case 'A':
+            moveLeft = true;
+            break;
+        case 'd':
+        case 'D':
+            moveRight = true;
+            break;
     }
+});
+
+document.addEventListener('keyup', (event) => {
+    switch (event.key) {
+        case 'w':
+        case 'W':
+            moveForward = false;
+            break;
+        case 's':
+        case 'S':
+            moveBackward = false;
+            break;
+        case 'a':
+        case 'A':
+            moveLeft = false;
+            break;
+        case 'd':
+        case 'D':
+            moveRight = false;
+            break;
+    }
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Movimento suave de zoom
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    direction.multiplyScalar(zoomSpeed);
+    camera.position.add(direction);
+
+    // Movimentação da câmera
+    const cameraDirection = new THREE.Vector3();
+    camera.getWorldDirection(cameraDirection);
+    cameraDirection.y = 0; // Mantenha o eixo Y constante
+    cameraDirection.normalize();
+
+    const cameraRight = new THREE.Vector3();
+    camera.getWorldDirection(cameraRight);
+    cameraRight.cross(camera.up); // Direção à direita
+    cameraRight.normalize();
+
+    if (moveForward) camera.position.add(cameraDirection.multiplyScalar(moveSpeed));
+    if (moveBackward) camera.position.add(cameraDirection.multiplyScalar(-moveSpeed));
+    if (moveLeft) camera.position.add(cameraRight.multiplyScalar(-moveSpeed));
+    if (moveRight) camera.position.add(cameraRight.multiplyScalar(moveSpeed));
+
+    // Limitar a distância de zoom
+    const distance = camera.position.length();
+    if (distance < 1) {
+        camera.position.setLength(1);
+    }
+
+    zoomSpeed *= 0.9; // Reduzir a velocidade do zoom ao longo do tempo
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
+
+    estrelas.forEach(estrela => estrela.voltarTamanho());
+    if (intersects.length > 0) {
+        intersects[0].object.scale.set(1.5, 1.5, 1.5);
+    }
+
+    // Ajustar os sprites de texto
+    linhasTexto.forEach(item => {
+        const midPoint = new THREE.Vector3().addVectors(
+            new THREE.Vector3(item.pontos[0].x, item.pontos[0].y, item.pontos[0].z),
+            new THREE.Vector3(item.pontos[1].x, item.pontos[1].y, item.pontos[1].z)
+        ).multiplyScalar(0.5);
+        const distanceToCamera = midPoint.distanceTo(camera.position);
+
+        // Ajustar a escala com base na distância
+        const scaleFactor = 100 / distanceToCamera; // Ajuste o divisor para controlar a escala
+        item.sprite.scale.set(scaleFactor, scaleFactor * 0.4, 1); // Proporção adequada
+
+        // Orientar o sprite para a câmera
+        item.sprite.lookAt(camera.position);
+
+        // Ocultar o sprite se a distância for maior que um limite
+        if (distanceToCamera > 50) { // Ajuste o limite conforme necessário
+            item.sprite.visible = false;
+        } else {
+            item.sprite.visible = true;
+        }
+    });
+
+    renderer.render(scene, camera);
+}
 
     animate();
 
