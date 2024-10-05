@@ -11,7 +11,7 @@ body {
 #infoPanel {
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 10px; /* Alterado de left para right */
     background: rgba(0, 0, 0, 0.7);
     padding: 10px;
     border-radius: 8px;
@@ -20,7 +20,7 @@ body {
 #leftPanel {
     position: absolute;
     top: 10px;
-    right: 10px;
+    left: 10px; /* Alterado de right para left */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -60,7 +60,32 @@ button:hover {
     background: rgba(255, 255, 255, 0.05);
     padding: 10px;
     border-radius: 8px;
+    
+    /* Definir altura fixa */
+    height: 300px; /* Ajuste conforme necessário */
+    
+    /* Adicionar barra de rolagem vertical quando necessário */
+    overflow-y: auto;
+    
+    /* Opcional: melhorar a aparência da barra de rolagem */
+    scrollbar-width: thin; /* Para navegadores que suportam */
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
+
+/* Estilização adicional para navegadores baseados em WebKit (Chrome, Safari) */
+#constellationsList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#constellationsList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#constellationsList::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
 
 #constellationsList h4 {
     margin: 0 0 10px 0;
@@ -107,3 +132,60 @@ button:hover {
 .edit-button:hover {
     color: #ccc;
 }
+
+/* ... código existente ... */
+
+#selectedConstellation {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+#selectedConstellation h4 {
+    margin: 0 0 5px 0;
+    text-align: center;
+    color: #fff;
+}
+
+#selectedConstellation p {
+    text-align: center;
+    font-size: 1.1em;
+    margin: 0;
+    color: #00ff00; /* Cor verde para destacar */
+}
+
+
+#togglePanelsButton {
+    position: fixed; /* Fixado na tela */
+    bottom: 20px; /* Espaçamento do fundo */
+    right: 20px; /* Espaçamento da esquerda */
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1.5em;
+    transition: background 0.3s, color 0.3s, transform 0.3s;
+    z-index: 1000; /* Garantir que fique acima de outros elementos */
+}
+
+#togglePanelsButton:hover {
+    background: #fff;
+    color: #000;
+    transform: rotate(90deg); /* Pequena animação ao passar o mouse */
+}
+
+
+#infoPanel, #leftPanel {
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+#infoPanel.hidden, #leftPanel.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+

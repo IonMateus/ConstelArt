@@ -5,11 +5,11 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+
 const estrelas = [];
 let estrelaSelecionada = null;
 let estrelaEscolhidaParaConstelacao = null;
-let currentConstellation = null; // Constelação atualmente selecionada para associar linhas
-const linhasTexto = []; // Array para armazenar os sprites de texto
+let currentConstellation = null; 
 const constellations = []; // Array para armazenar constelações
 
 // Função para carregar estrelas do arquivo JSON
@@ -24,70 +24,6 @@ async function carregarEstrelas() {
     });
 }
 
-// Função para criar sprites de texto
-function createTextSprite(message) {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    // Configurações do canvas
-    const fontSize = 64; // Tamanho da fonte
-    context.font = `${fontSize}px Orbitron`; // Usando a fonte Orbitron
-    const textWidth = context.measureText(message).width;
-    canvas.width = textWidth;
-    canvas.height = fontSize;
-
-    // Redefinir a fonte após redimensionar o canvas
-    context.font = `${fontSize}px Orbitron`;
-    context.fillStyle = 'white';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-
-    // Criar a textura a partir do canvas
-    const texture = new THREE.CanvasTexture(canvas);
-    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
-    const sprite = new THREE.Sprite(spriteMaterial);
-
-    // Escala inicial do sprite
-    sprite.scale.set(5, 2, 1); // Ajuste conforme necessário
-
-    return sprite;
-}
-
-// Função para desenhar linha e adicionar sprite de texto
-function desenharLinha(estrela1, estrela2) {
-    if (!currentConstellation) {
-        alert("Por favor, selecione ou crie uma constelação para associar a linha.");
-        return;
-    }
-
-    // Criar a linha
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff }); // Cor branca para combinar com o tema
-    const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(estrela1.x, estrela1.y, estrela1.z),
-        new THREE.Vector3(estrela2.x, estrela2.y, estrela2.z)
-    ]);
-    const linha = new THREE.Line(geometry, material);
-    scene.add(linha);
-
-    // Adicionar a linha à constelação
-    currentConstellation.lines.push(linha);
-
-    // Criar o sprite de texto
-    const texto = "lorem ispum";
-    const textoSprite = createTextSprite(texto);
-
-    // Calcular o ponto médio da linha
-    const midPoint = new THREE.Vector3().addVectors(
-        new THREE.Vector3(estrela1.x, estrela1.y, estrela1.z),
-        new THREE.Vector3(estrela2.x, estrela2.y, estrela2.z)
-    ).multiplyScalar(0.5);
-    textoSprite.position.copy(midPoint);
-    scene.add(textoSprite);
-
-    // Armazenar o sprite e os pontos para ajuste posterior
-    linhasTexto.push({ sprite: textoSprite, pontos: [estrela1, estrela2], constellation: currentConstellation });
-}
 
 // Função para criar uma nova constelação
 function criarConstelacao(nome) {
@@ -97,6 +33,24 @@ function criarConstelacao(nome) {
     };
     constellations.push(constelacao);
     adicionarConstelacaoNaLista(constelacao);
+
+    selecionarConstelacao(constelacao);
+
+}
+
+
+function deselecionarTodasConstelacoes() {
+    // Desabilitar todas as linhas
+    constellations.forEach(c => {
+        c.lines.forEach(linha => linha.visible = false);
+    });
+
+
+    currentConstellation = null; // Nenhuma constelação atualmente selecionada
+
+    // Atualizar a exibição na UI
+    const constellationNameElement = document.getElementById('constellationName');
+    constellationNameElement.textContent = 'Nenhuma selecionada';
 }
 
 // Função para adicionar constelação na lista do painel esquerdo
@@ -132,16 +86,14 @@ function selecionarConstelacao(constelacao) {
     // Habilitar apenas as linhas da constelação selecionada
     constelacao.lines.forEach(linha => linha.visible = true);
 
-    // Ajustar a visibilidade dos sprites de texto
-    linhasTexto.forEach(item => {
-        if (item.constellation === constelacao) {
-            item.sprite.visible = true;
-        } else {
-            item.sprite.visible = false;
-        }
-    });
-
     currentConstellation = constelacao; // Definir a constelação atual para associar novas linhas
+
+    const constellationNameElement = document.getElementById('constellationName');
+    if (constelacao) {
+        constellationNameElement.textContent = constelacao.name;
+    } else {
+        constellationNameElement.textContent = 'Nenhuma selecionada';
+    }
 }
 
 // Função para editar o nome da constelação
@@ -162,34 +114,38 @@ function handleAddConstellation() {
 }
 
 // Função para criar sprites de texto (removida duplicação)
-function createTextSprite(message) {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
 
-    // Configurações do canvas
-    const fontSize = 64; // Tamanho da fonte
-    context.font = `${fontSize}px Orbitron`; // Usando a fonte Orbitron
-    const textWidth = context.measureText(message).width;
-    canvas.width = textWidth;
-    canvas.height = fontSize;
 
-    // Redefinir a fonte após redimensionar o canvas
-    context.font = `${fontSize}px Orbitron`;
-    context.fillStyle = 'white';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
+function togglePanels() {
+    const infoPanel = document.getElementById('infoPanel');
+    const leftPanel = document.getElementById('leftPanel');
+    const toggleButton = document.getElementById('togglePanelsButton');
 
-    // Criar a textura a partir do canvas
-    const texture = new THREE.CanvasTexture(canvas);
-    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
-    const sprite = new THREE.Sprite(spriteMaterial);
-
-    // Escala inicial do sprite
-    sprite.scale.set(5, 2, 1); // Ajuste conforme necessário
-
-    return sprite;
+    if (infoPanel.style.display === 'none' && leftPanel.style.display === 'none') {
+        // Mostrar os painéis
+        infoPanel.style.display = 'block';
+        leftPanel.style.display = 'flex'; // Flex para manter a direção definida
+        toggleButton.textContent = '☰'; // Ícone para esconder
+        toggleButton.title = 'Esconder Painéis';
+    } else {
+        // Esconder os painéis
+        infoPanel.style.display = 'none';
+        leftPanel.style.display = 'none';
+        toggleButton.textContent = '☰'; // Você pode mudar o ícone se preferir
+        toggleButton.title = 'Mostrar Painéis';
+    }
 }
+
+// Adicionar evento de clique ao botão
+document.getElementById('togglePanelsButton').addEventListener('click', togglePanels);
+
+// Opcional: Inicialmente, garantir que os painéis estão visíveis
+window.addEventListener('load', () => {
+    const infoPanel = document.getElementById('infoPanel');
+    const leftPanel = document.getElementById('leftPanel');
+    infoPanel.style.display = 'block';
+    leftPanel.style.display = 'flex';
+});
 
 carregarEstrelas().then(() => {
     camera.position.set(0, 0, 20);
@@ -295,21 +251,13 @@ carregarEstrelas().then(() => {
         // Adicionar a linha à constelação
         currentConstellation.lines.push(linha);
 
-        // Criar o sprite de texto
-        const texto = "lorem ispum";
-        const textoSprite = createTextSprite(texto);
-
         // Calcular o ponto médio da linha
         const midPoint = new THREE.Vector3().addVectors(
             new THREE.Vector3(estrela1.x, estrela1.y, estrela1.z),
             new THREE.Vector3(estrela2.x, estrela2.y, estrela2.z)
         ).multiplyScalar(0.5);
-        textoSprite.position.copy(midPoint);
-        scene.add(textoSprite);
-
-        // Armazenar o sprite e os pontos para ajuste posterior
-        linhasTexto.push({ sprite: textoSprite, pontos: [estrela1, estrela2], constellation: currentConstellation });
     }
+
 
     function animate() {
         requestAnimationFrame(animate);
@@ -335,29 +283,6 @@ carregarEstrelas().then(() => {
         if (intersects.length > 0) {
             intersects[0].object.scale.set(1.5, 1.5, 1.5);
         }
-
-        // Ajustar os sprites de texto
-        linhasTexto.forEach(item => {
-            const midPoint = new THREE.Vector3().addVectors(
-                new THREE.Vector3(item.pontos[0].x, item.pontos[0].y, item.pontos[0].z),
-                new THREE.Vector3(item.pontos[1].x, item.pontos[1].y, item.pontos[1].z)
-            ).multiplyScalar(0.5);
-            const distanceToCamera = midPoint.distanceTo(camera.position);
-
-            // Ajustar a escala com base na distância
-            const scaleFactor = 100 / distanceToCamera; // Ajuste o divisor para controlar a escala
-            item.sprite.scale.set(scaleFactor, scaleFactor * 0.4, 1); // Proporção adequada
-
-            // Orientar o sprite para a câmera
-            item.sprite.lookAt(camera.position);
-
-            // Ocultar o sprite se a distância for maior que um limite
-            if (distanceToCamera > 50) { // Ajuste o limite conforme necessário
-                item.sprite.visible = false;
-            } else {
-                item.sprite.visible = true;
-            }
-        });
 
         renderer.render(scene, camera);
     }
@@ -393,3 +318,4 @@ carregarEstrelas().then(() => {
         zoomSpeed -= event.deltaY * 0.001; // Ajuste o fator conforme necessário
     });
 });
+

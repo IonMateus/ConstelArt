@@ -16,6 +16,13 @@
         <button id="backButton">Voltar</button>
         <button id="downloadButton">Download</button>
         <button id="addConstellationButton">+</button>
+
+        <!-- Novo elemento para exibir a constelação selecionada -->
+        <div id="selectedConstellation">
+            <h4>Constelação Selecionada:</h4>
+            <p id="constellationName">Nenhuma selecionada</p>
+        </div>
+
         <div id="constellationsList">
             <h4>Constelações</h4>
             <ul id="constellationItems">
@@ -23,6 +30,8 @@
             </ul>
         </div>
     </div>
+
+    <button id="togglePanelsButton" title="Esconder/Mostrar Painéis">☰</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="../scripts/Estrela.js"></script> 
