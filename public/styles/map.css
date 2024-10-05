@@ -1,66 +1,109 @@
+/* map.css */
+
 body {
     margin: 0;
-    display: flex;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
     background-color: #000;
-    color: #ffffff;
-    font-family: 'Arial', sans-serif;
-}
-
-*{
-    font-family: 'Orbitron', sans-serif; 
-    letter-spacing: 0.2em; 
-}
-
-
-canvas {
-    display: block;
+    color: #fff;
 }
 
 #infoPanel {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    width: 200px;
-}
-
-#infoPanel h3 {
-    margin: 0 0 10px;
-    font-size: 18px;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 8px;
 }
 
 #leftPanel {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    width: 150px;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.2); /* Fundo semi-transparente */
-    color: #ffffff;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+    color: #fff;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+    border-radius: 5px;
+    font-size: 1.2em;
+    transition: background 0.3s, color 0.3s;
 }
 
 button:hover {
-    background-color: rgba(255, 255, 255, 0.3); /* Mais claro ao passar o mouse */
+    background: #fff;
+    color: #000;
 }
 
-button:active {
-    transform: scale(0.95); /* Efeito de clique */
+#addConstellationButton {
+    background: rgba(0, 255, 0, 0.3); /* Verde para destacar */
+    border-color: #00ff00;
+    font-size: 1.5em;
+    padding: 10px 15px;
+    text-align: center;
+    line-height: 1;
+}
+
+#addConstellationButton:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+#constellationsList {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+#constellationsList h4 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: #fff;
+}
+
+#constellationItems {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#constellationItems li {
+    padding: 8px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s;
+}
+
+#constellationItems li:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.constellation-name {
+    flex-grow: 1;
+    user-select: none;
+}
+
+.edit-button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 1em;
+}
+
+.edit-button:hover {
+    color: #ccc;
 }
