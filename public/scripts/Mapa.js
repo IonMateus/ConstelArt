@@ -64,10 +64,6 @@ const scene = new THREE.Scene();
 
             let zoomSpeed = 0;
 
-            document.addEventListener('wheel', (event) => {
-                zoomSpeed += event.deltaY * 0.01;
-            });
-
             document.addEventListener('mousedown', (event) => {
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
@@ -185,7 +181,8 @@ const scene = new THREE.Scene();
             });
 
             window.addEventListener('wheel', (event) => {
-                camera.position.z += event.deltaY * 0.05; // Aumentando o fator de zoom
-                camera.position.z = Math.max(1, camera.position.z);
+                zoomSpeed -= event.deltaY * 0.001; // Ajuste o fator conforme necessário
             });
+            
+            
         });
