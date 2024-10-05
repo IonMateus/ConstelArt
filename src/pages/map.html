@@ -17,12 +17,31 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 200px;
         }
+        #leftPanel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 150px;
+        }
+        button {
+            margin-top: 10px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
     <div id="infoPanel">
         <h3>Informações da Estrela</h3>
         <div id="starInfo">Selecione uma estrela para ver os detalhes.</div>
+        <button id="enterExoplanet" style="display: none;">Entrar no Exoplaneta</button>
+    </div>
+    <div id="leftPanel">
+        <button id="backButton">Voltar</button>
+        <button id="downloadButton">Download</button>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="Estrela.js"></script> <!-- Importa a classe Estrela -->
@@ -34,8 +53,9 @@
         document.body.appendChild(renderer.domElement);
 
         const estrelas = [];
+        let estrelaSelecionada = null;
+        let estrelaEscolhidaParaConstelacao = null;
 
-        // Função para carregar estrelas do arquivo JSON
         async function carregarEstrelas() {
             const response = await fetch('estrelas.json');
             const data = await response.json();
@@ -48,11 +68,12 @@
         }
 
         carregarEstrelas().then(() => {
-            camera.position.z = 20; // Aumentando a distância inicial da câmera
+            camera.position.set(0, 0, 20);
 
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
-            let estrelaSelecionada = null;
+            let isMouseDown = false;
+            let previousMousePosition = { x: 0, y: 0 };
 
             document.addEventListener('mousemove', (event) => {
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -60,18 +81,60 @@
             });
 
             document.addEventListener('mousedown', (event) => {
-                // Raycaster para interação ao clicar
+                isMouseDown = true;
+                previousMousePosition = { x: event.clientX, y: event.clientY };
+            });
+
+            document.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+
+            document.addEventListener('mousemove', (event) => {
+                if (isMouseDown) {
+                    const deltaMove = {
+                        x: event.clientX - previousMousePosition.x,
+                        y: event.clientY - previousMousePosition.y
+                    };
+
+                    camera.rotation.y += deltaMove.x * 0.005; // Rotação ao redor do eixo Y
+                    camera.rotation.x += deltaMove.y * 0.005; // Rotação ao redor do eixo X
+
+                    // Limitar a rotação para evitar giro completo
+                    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+                }
+
+                previousMousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+            });
+
+            let targetZoom = camera.position.z;
+
+            document.addEventListener('wheel', (event) => {
+                targetZoom += event.deltaY * 0.05;
+                targetZoom = Math.max(1, targetZoom);
+            });
+
+            document.addEventListener('mousedown', (event) => {
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
 
                 if (intersects.length > 0) {
-                    if (estrelaSelecionada) {
-                        estrelaSelecionada.deselecionar(); // Desseleciona a estrela anterior
+                    const estrelaAtual = estrelas.find(estrela => estrela.mesh === intersects[0].object);
+                    if (estrelaEscolhidaParaConstelacao === null) {
+                        estrelaEscolhidaParaConstelacao = estrelaAtual;
+                        if (estrelaSelecionada) {
+                            estrelaSelecionada.deselecionar();
+                        }
+                        estrelaSelecionada = estrelaAtual;
+                        estrelaSelecionada.selecionar();
+                        mostrarInformacoes(estrelaSelecionada);
+                        document.getElementById('enterExoplanet').style.display = 'block';
+                    } else {
+                        desenharLinha(estrelaEscolhidaParaConstelacao, estrelaAtual);
+                        estrelaEscolhidaParaConstelacao = null;
                     }
-
-                    estrelaSelecionada = estrelas.find(estrela => estrela.mesh === intersects[0].object);
-                    estrelaSelecionada.selecionar(); // Seleciona a nova estrela
-                    mostrarInformacoes(estrelaSelecionada);
                 }
             });
 
@@ -83,43 +146,20 @@
                 `;
             }
 
-            let isMouseDown = false;
-            let previousMousePosition = { x: 0, y: 0 };
-
-            document.addEventListener('mousedown', (event) => {
-                isMouseDown = true;
-            });
-
-            document.addEventListener('mouseup', () => {
-                isMouseDown = false;
-            });
-
-            document.addEventListener('mousemove', (event) => {
-                if (isMouseDown) {
-                    const deltaMove = {
-                        x: event.offsetX - previousMousePosition.x,
-                        y: event.offsetY - previousMousePosition.y
-                    };
-
-                    const deltaRotationQuaternion = new THREE.Quaternion()
-                        .setFromEuler(new THREE.Euler(
-                            deltaMove.y * 0.01,
-                            deltaMove.x * 0.01,
-                            0,
-                            'XYZ'
-                        ));
-
-                    camera.quaternion.multiplyQuaternions(deltaRotationQuaternion, camera.quaternion);
-                }
-
-                previousMousePosition = {
-                    x: event.offsetX,
-                    y: event.offsetY
-                };
-            });
+            function desenharLinha(estrela1, estrela2) {
+                const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+                const geometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(estrela1.x, estrela1.y, estrela1.z),
+                    new THREE.Vector3(estrela2.x, estrela2.y, estrela2.z)
+                ]);
+                const linha = new THREE.Line(geometry, material);
+                scene.add(linha);
+            }
 
             function animate() {
                 requestAnimationFrame(animate);
+
+                camera.position.z += (targetZoom - camera.position.z) * 0.1; // Movimento suave de zoom
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
 
@@ -133,15 +173,24 @@
 
             animate();
 
+            document.getElementById('downloadButton').addEventListener('click', () => {
+              renderer.render(scene, camera); // Renderiza a cena atual
+              const dataURL = renderer.domElement.toDataURL('image/png');
+              const link = document.createElement('a');
+              link.href = dataURL;
+              link.download = 'mapa_estelar.png';
+              link.click();
+          });
+          
+
+            document.getElementById('backButton').addEventListener('click', () => {
+                window.history.back();
+            });
+
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            window.addEventListener('wheel', (event) => {
-                camera.position.z += event.deltaY * 0.05; // Aumentando o fator de zoom
-                camera.position.z = Math.max(1, camera.position.z);
             });
         });
     </script>
