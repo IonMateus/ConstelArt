@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Star Map - Space Apps Connect</title>
+    <title>ConstelArt</title>
     <link rel="stylesheet" href="./styles/main.css">
-    <!-- Google Fonts -->
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1224px-NASA_logo.svg.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <header class="header">
         <div class="container">
             <div class="logo">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1224px-NASA_logo.svg.png" alt="NASA Logo">
-                <h1>3D Star Map</h1>
+                <h1>ConstelArt</h1>
             </div>
             <nav class="nav">
                 <ul>
@@ -22,7 +24,6 @@
                     <li><a href="#about">About</a></li>
                     <li><a href="#team">Team</a></li>
                     <li><a href="#video">Video</a></li>
-                    <li><a href="#footer">Contact</a></li>
                 </ul>
             </nav>
         </div>
@@ -32,7 +33,8 @@
     <section class="hero" id="hero">
         <div class="hero-overlay">
             <div class="hero-content">
-                <h2>Explore the Universe from Exoplanets</h2>
+                <h2>ConstelArt</h2>
+                <p><i>Explore the space and create new constellations!</i></p> <br>
                 <a href="pages/map.html" class="btn">Enter the Map</a>
             </div>
         </div>
@@ -45,19 +47,36 @@
             <p>
                 The 3D Star Map is an educational tool that allows students to explore the night sky of newly discovered exoplanets. Based on data from the NASA Exoplanet Archive and star catalogs like Gaia DR3, our project visualizes how the sky would look from different perspectives outside of Earth.
             </p>
-            <h3>The challenge</h3>
+            <h2>The challenge</h2>
             <p>
                 Develop an app or interface for students that allows them to choose an exoplanet and then either display an interactive star chart or export a high-quality image for printing or viewing on a computer or virtual reality display, where they can draw and name constellations.
             </p>
+            <!-- Link para o Challenge -->
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="https://www.spaceappschallenge.org/nasa-space-apps-2024/challenges/exosky/" class="external-link" target="_blank" rel="noopener noreferrer">Learn More About the Challenge</a>
+            </p>
         </div>
     </section>
+
+        <!-- Video Section -->
+        <section class="video" id="video">
+            <div class="container">
+                <h2>Our Presentation</h2>
+                <div class="video-container">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/QWO7ufSW9Oo" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
 
     <!-- Team Section -->
     <section class="team" id="team">
         <div class="container">
             <h2>Our Team</h2>
             <div class="team-grid">
-                <!-- Team Member Card -->
+                <!-- Team Member Cards -->
                 <div class="team-card">
                     <a href="https://github.com/cc23122" target="_blank" rel="noopener noreferrer">
                         <img src="https://avatars.githubusercontent.com/u/142425178?v=4" alt="Ana">
@@ -100,19 +119,7 @@
                     <h3>Sofia</h3>
                     <p>Computer Science Student</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Video Section -->
-    <section class="video" id="video">
-        <div class="container">
-            <h2>Our Presentation</h2>
-            <div class="video-container">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/QWO7ufSW9Oo" 
-                title="YouTube video player" frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
+                <a href="https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/cotuquers1/" class="external-link" target="_blank" rel="noopener noreferrer">Our Team</a>
             </div>
         </div>
     </section>
@@ -121,9 +128,7 @@
     <footer class="footer" id="footer">
         <div class="container">
             <div class="footer-content">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1224px-NASA_logo.svg.png" alt="NASA Logo">
-                <p>See the Project's <a href="https://github.com/IonMateus/ConstelArt">source code</a> </p>
-                <p>&copy; 2024 ConstelArt | Developed by Temdog007</p>
+                <p>See the Project's <a href="https://github.com/IonMateus/ConstelArt" class="external-link" target="_blank" rel="noopener noreferrer">source code</a></p>
             </div>
         </div>
     </footer>

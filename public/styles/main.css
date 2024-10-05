@@ -6,6 +6,11 @@ body {
     color: #fff;
 }
 
+*{
+    font-family: 'Orbitron', sans-serif; 
+    letter-spacing: 0.2em; 
+}
+
 /* Container */
 .container {
     width: 90%;
@@ -37,14 +42,14 @@ body {
 }
 
 .logo img {
-    width: 64px; /* Logo menor */
-    margin-right: 5px;
+    width: 40px; /* Logo menor */
+    margin-right: 10px;
 }
 
 .logo h1 {
     font-size: 1.2em;
     margin: 0;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; /* Branco */
 }
 
 .nav ul {
@@ -66,13 +71,13 @@ body {
 }
 
 .nav ul li a:hover {
-    color: #00f5ff; /* Azul estrela */
+    color: #ccc; /* Cinza claro */
 }
 
 /* Hero Section */
 .hero {
     height: 100vh;
-    background: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1950&q=80') center center/cover no-repeat;
+    background: url('https://smd-cms.nasa.gov/wp-content/uploads/2023/04/hubble_cha1_mosiac-jpg.webp') center center/cover no-repeat;
     position: relative;
     display: flex;
     align-items: center;
@@ -99,17 +104,21 @@ body {
     height: 100%;
 }
 
+.hero-content p{
+    font-size: 20px;
+}
+
 .hero-content h2 {
     font-size: 3em;
     margin-bottom: 20px;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; 
 }
 
 .btn {
     padding: 15px 30px;
-    background: rgba(0, 245, 255, 0.2);
-    border: 2px solid #00f5ff;
-    color: #00f5ff;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+    color: #fff;
     text-decoration: none;
     font-size: 1.2em;
     border-radius: 30px;
@@ -117,7 +126,7 @@ body {
 }
 
 .btn:hover {
-    background: #00f5ff;
+    background: #fff;
     color: #000;
 }
 
@@ -130,7 +139,7 @@ body {
 
 .about .container {
     backdrop-filter: blur(10px);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.05);
     padding: 40px;
     border-radius: 15px;
 }
@@ -138,7 +147,7 @@ body {
 .about h2 {
     text-align: center;
     margin-bottom: 20px;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; /* Branco */
 }
 
 .about p {
@@ -146,24 +155,34 @@ body {
     line-height: 1.6;
     max-width: 800px;
     margin: 0 auto 20px;
+    color: #ccc; /* Cinza claro */
 }
 
 .about h3 {
     text-align: center;
     margin-top: 40px;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; /* Branco */
+}
+
+.external-link {
+    color: #fff;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.external-link:hover {
+    color: #ccc;
 }
 
 /* Team Section */
 .team {
-    background: #090909;
     color: #fff;
     padding: 60px 0;
 }
 
 .team .container {
     backdrop-filter: blur(10px);
-    background: #090909;
+    background: rgba(255, 255, 255, 0.05);
     padding: 40px;
     border-radius: 15px;
 }
@@ -171,7 +190,7 @@ body {
 .team h2 {
     text-align: center;
     margin-bottom: 40px;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; /* Branco */
 }
 
 .team-grid {
@@ -200,7 +219,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
-    border: 3px solid #00f5ff;
+    border: 3px solid #fff;
 }
 
 .team-card h3 {
@@ -210,7 +229,7 @@ body {
 
 .team-card p {
     margin: 0;
-    color: #ddd;
+    color: #ccc; /* Cinza claro */
 }
 
 /* Video Section */
@@ -222,7 +241,7 @@ body {
 
 .video .container {
     backdrop-filter: blur(10px);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.05);
     padding: 40px;
     border-radius: 15px;
 }
@@ -230,7 +249,7 @@ body {
 .video h2 {
     text-align: center;
     margin-bottom: 40px;
-    color: #00f5ff; /* Azul estrela */
+    color: #fff; /* Branco */
 }
 
 .video-container {
@@ -244,7 +263,7 @@ body {
     height: 450px;
     border: none;
     border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
     transition: transform 0.3s;
 }
 
@@ -254,9 +273,9 @@ body {
 
 /* Footer */
 .footer {
-    background: #090909;
+    background: #121212;
     color: #ddd;
-    padding: 10px 0; /* Menor altura */
+    padding: 10px;
 }
 
 .footer .container {
@@ -272,22 +291,24 @@ body {
 }
 
 .footer img {
-    width: 40px; /* Logo menor */
+    width: 30px; /* Logo menor */
     margin-bottom: 10px;
 }
 
 .footer p {
     margin: 0;
     font-size: 0.9em;
+    color: #ccc; /* Cinza claro */
 }
 
 .footer a {
-    color: #00f5ff;
-    text-decoration: none;
+    color: #fff;
+    text-decoration: underline;
+    transition: color 0.3s;
 }
 
 .footer a:hover {
-    text-decoration: underline;
+    color: #ccc;
 }
 
 /* Responsividade */
