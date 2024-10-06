@@ -189,3 +189,11 @@ button:hover {
     visibility: hidden;
 }
 
+@media screen and (max-width: 700px) { 
+    html, body {
+        touch-action: none; /* Previne o comportamento padrão de zoom e outros gestos */
+        -webkit-user-select: none; /* Previne seleção de texto em mobile */
+        user-select: none; 
+        -webkit-touch-callout: none; /* Previne o menu de contexto no toque */
+    }
+}
