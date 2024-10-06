@@ -319,50 +319,55 @@ carregarEstrelas().then(() => {
     });
 
     // Eventos para acessibilidade mobile
-        // Eventos para Mobile (Toque)
-        document.addEventListener('touchstart', (event) => {
-            if (event.touches.length === 1) {
-                isTouching = true;
-                previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-            } else if (event.touches.length === 2) {
-                isTouching = false;
-                initialDistance = Math.hypot(
-                    event.touches[0].clientX - event.touches[1].clientX,
-                    event.touches[0].clientY - event.touches[1].clientY
-                );
-            }
-        });
-    
-        document.addEventListener('touchmove', (event) => {
-            if (isTouching && event.touches.length === 1) {
-                const deltaMove = {
-                    x: event.touches[0].clientX - previousMousePosition.x,
-                    y: event.touches[0].clientY - previousMousePosition.y
-                };
-    
-                camera.rotation.y += deltaMove.x * 0.005;
-                camera.rotation.x += deltaMove.y * 0.005;
-    
-                camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
-    
-                previousMousePosition = {
-                    x: event.touches[0].clientX,
-                    y: event.touches[0].clientY
-                };
-            } else if (event.touches.length === 2) {
-                const currentDistance = Math.hypot(
-                    event.touches[0].clientX - event.touches[1].clientX,
-                    event.touches[0].clientY - event.touches[1].clientY
-                );
-    
-                const zoomFactor = currentDistance / initialDistance;
-                zoomSpeed = (zoomFactor - 1) * 5; // Ajuste o fator conforme necessário
-                initialDistance = currentDistance;
-            }
-        });
-    
-        document.addEventListener('touchend', () => {
+    let isTouching = false;
+    let initialDistance = 0;
+
+    // Eventos para Mobile (Toque)
+    document.addEventListener('touchstart', (event) => {
+        if (event.touches.length === 1) {
+            isTouching = true;
+            previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        } else if (event.touches.length === 2) {
             isTouching = false;
-        });
+            initialDistance = Math.hypot(
+                event.touches[0].clientX - event.touches[1].clientX,
+                event.touches[0].clientY - event.touches[1].clientY
+            );
+        }
+        event.preventDefault(); // Impedir zoom padrão do navegador
+    });
+
+    document.addEventListener('touchmove', (event) => {
+        if (isTouching && event.touches.length === 1) {
+            const deltaMove = {
+                x: event.touches[0].clientX - previousMousePosition.x,
+                y: event.touches[0].clientY - previousMousePosition.y
+            };
+
+            camera.rotation.y += deltaMove.x * 0.005;
+            camera.rotation.x += deltaMove.y * 0.005;
+
+            camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+            previousMousePosition = {
+                x: event.touches[0].clientX,
+                y: event.touches[0].clientY
+            };
+        } else if (event.touches.length === 2) {
+            const currentDistance = Math.hypot(
+                event.touches[0].clientX - event.touches[1].clientX,
+                event.touches[0].clientY - event.touches[1].clientY
+            );
+
+            const zoomFactor = currentDistance / initialDistance;
+            zoomSpeed = (zoomFactor - 1) * 5; // Ajuste o fator conforme necessário
+            initialDistance = currentDistance;
+        }
+        event.preventDefault(); // Impedir comportamento padrão do navegador
+    });
+
+    document.addEventListener('touchend', () => {
+        isTouching = false;
+    });
 });
 
