@@ -42,7 +42,7 @@ body {
 }
 
 .logo img {
-    width: 40px; /* Logo menor */
+    height: 40px; /* Logo menor */
     margin-right: 10px;
 }
 
