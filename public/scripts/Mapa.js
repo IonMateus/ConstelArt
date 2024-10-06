@@ -10,7 +10,7 @@ const estrelas = [];
 let estrelaSelecionada = null;
 let estrelaEscolhidaParaConstelacao = null;
 let currentConstellation = null; 
-const constellations = []; // Array para armazenar constelações
+const constellations = []; 
 
 // Função para carregar estrelas do arquivo JSON
 async function carregarEstrelas() {
@@ -37,6 +37,101 @@ function criarConstelacao(nome) {
     selecionarConstelacao(constelacao);
 
 }
+
+function calcularPontoMedio(constelacao) {
+    const midPoint = new THREE.Vector3();
+
+    // Soma as posições das estrelas da constelação
+    const totalEstrelas = constelacao.lines.length;
+    const positions = constelacao.lines.map(line => {
+        return line.geometry.attributes.position.array;
+    });
+
+    for (const position of positions) {
+        midPoint.add(new THREE.Vector3(position[0], position[1], position[2])); // Ponto inicial
+        midPoint.add(new THREE.Vector3(position[3], position[4], position[5])); // Ponto final
+    }
+
+    // Divide pela quantidade de linhas para encontrar o ponto médio
+    return midPoint.divideScalar(totalEstrelas * 2);
+}
+
+let constellationLabelSprite = null; 
+function adicionarTextoConstelacao(constelacao) {
+    // Calcular o ponto médio
+    const pontoMedio = calcularPontoMedio(constelacao);
+
+    // Criar ou atualizar o sprite de texto da constelação
+    if (!constellationLabelSprite) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        // Aumentar a resolução do canvas para melhorar a qualidade
+        const canvasScale = 4; // Fator de escala para aumentar a qualidade
+        const canvasWidth = 500; // Aumentado para evitar corte
+        const canvasHeight = 200; // Aumentado para evitar corte
+        canvas.width = canvasWidth * canvasScale;
+        canvas.height = canvasHeight * canvasScale;
+
+        context.scale(canvasScale, canvasScale); // Escalar o contexto do canvas
+
+        // Configurar o texto
+        const fontSize = 100; // Tamanho da fonte maior
+        context.font = `${fontSize}px Orbitron`;
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle'; // Centraliza verticalmente
+        context.fillText(constelacao.name, canvasWidth / 2, canvasHeight / 2); // Posição centralizada
+
+        // Criar textura a partir do canvas
+        const textura = new THREE.Texture(canvas);
+        textura.needsUpdate = true;
+        textura.minFilter = THREE.LinearFilter; // Para evitar problemas com texturas de não-potência de 2
+
+        // Criar material de sprite
+        const material = new THREE.SpriteMaterial({ map: textura, transparent: true });
+
+        // Criar sprite
+        constellationLabelSprite = new THREE.Sprite(material);
+        constellationLabelSprite.position.copy(pontoMedio); // Posicionar no ponto médio
+        constellationLabelSprite.userData.isConstellationLabel = true; // Marcar o sprite
+
+        // Adicionar sprite à cena
+        scene.add(constellationLabelSprite);
+    } else {
+        // Se o sprite já existe, apenas atualize sua posição e texto
+        constellationLabelSprite.position.copy(pontoMedio);
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        // Aumentar a resolução do canvas para melhorar a qualidade
+        const canvasScale = 4; // Fator de escala para aumentar a qualidade
+        const canvasWidth = 500; // Aumentado para evitar corte
+        const canvasHeight = 200; // Aumentado para evitar corte
+        canvas.width = canvasWidth * canvasScale;
+        canvas.height = canvasHeight * canvasScale;
+
+        context.scale(canvasScale, canvasScale); // Escalar o contexto do canvas
+
+        // Configurar o texto
+        const fontSize = 100; // Tamanho da fonte maior
+        context.font = `${fontSize}px Orbitron`;
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle'; // Centraliza verticalmente
+        context.fillText(constelacao.name, canvasWidth / 2, canvasHeight / 2); // Posição centralizada
+
+        // Atualizar textura do sprite
+        const textura = new THREE.Texture(canvas);
+        textura.needsUpdate = true;
+        textura.minFilter = THREE.LinearFilter;
+
+        constellationLabelSprite.material.map = textura;
+        constellationLabelSprite.material.needsUpdate = true;
+    }
+}
+
 
 
 function deselecionarTodasConstelacoes() {
@@ -76,7 +171,7 @@ function adicionarConstelacaoNaLista(constelacao) {
     constellationItems.appendChild(li);
 }
 
-// Função para selecionar uma constelação
+
 function selecionarConstelacao(constelacao) {
     // Desabilitar todas as linhas
     constellations.forEach(c => {
@@ -91,11 +186,11 @@ function selecionarConstelacao(constelacao) {
     const constellationNameElement = document.getElementById('constellationName');
     if (constelacao) {
         constellationNameElement.textContent = constelacao.name;
+        adicionarTextoConstelacao(constelacao); 
     } else {
         constellationNameElement.textContent = 'Nenhuma selecionada';
     }
 }
-
 // Função para editar o nome da constelação
 function editarConstelacaoNome(constelacao, spanElement) {
     const novoNome = prompt("Digite o novo nome da constelação:", constelacao.name);
@@ -205,6 +300,7 @@ carregarEstrelas().then(() => {
                 estrelaSelecionada = estrelaAtual;
                 estrelaSelecionada.selecionar();
                 mostrarInformacoes(estrelaSelecionada);
+                mostrarInstrucoes(); 
                 // Assegure-se de que há um elemento com id 'enterExoplanet' no HTML
                 const enterExoplanet = document.getElementById('enterExoplanet');
                 if (enterExoplanet) {
@@ -213,6 +309,8 @@ carregarEstrelas().then(() => {
             } else {
                 desenharLinha(estrelaEscolhidaParaConstelacao, estrelaAtual);
                 estrelaEscolhidaParaConstelacao = null;
+                esconderInstrucoes(); // Esconder instruções após desenhar a linha
+
             }
         }
     });
@@ -233,12 +331,13 @@ carregarEstrelas().then(() => {
         `;
     }
 
+
     function desenharLinha(estrela1, estrela2) {
         if (!currentConstellation) {
             alert("Por favor, selecione ou crie uma constelação para associar a linha.");
             return;
         }
-
+    
         // Criar a linha
         const material = new THREE.LineBasicMaterial({ color: 0xffffff }); // Cor branca para combinar com o tema
         const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -247,57 +346,112 @@ carregarEstrelas().then(() => {
         ]);
         const linha = new THREE.Line(geometry, material);
         scene.add(linha);
-
+    
         // Adicionar a linha à constelação
         currentConstellation.lines.push(linha);
-
+    
         // Calcular o ponto médio da linha
         const midPoint = new THREE.Vector3().addVectors(
             new THREE.Vector3(estrela1.x, estrela1.y, estrela1.z),
             new THREE.Vector3(estrela2.x, estrela2.y, estrela2.z)
         ).multiplyScalar(0.5);
+    
+        // Atualizar o rótulo de texto da constelação
+        adicionarTextoConstelacao(currentConstellation);
     }
+    
 
 
     function animate() {
         requestAnimationFrame(animate);
-
+    
         // Movimento suave de zoom
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         direction.multiplyScalar(zoomSpeed);
         camera.position.add(direction);
-
+    
         // Limitar a distância de zoom
         const distance = camera.position.length();
         if (distance < 1) {
             camera.position.setLength(1);
         }
-
+    
         zoomSpeed *= 0.9; // Reduzir a velocidade do zoom ao longo do tempo
-
+    
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(estrelas.map(estrela => estrela.mesh));
-
+    
         estrelas.forEach(estrela => estrela.voltarTamanho());
         if (intersects.length > 0) {
             intersects[0].object.scale.set(1.5, 1.5, 1.5);
         }
-
+    
+        scene.children.forEach(child => {
+            if (child.isSprite) { // Verifique se é um sprite
+                child.lookAt(camera.position);
+                if (child.userData.isConstellationLabel) {
+                    const distance = camera.position.distanceTo(child.position);
+                    const scale = distance * 0.2; // Ajuste o fator conforme necessário
+                    child.scale.set(scale, scale, scale);
+                }
+            }
+        });
+    
         renderer.render(scene, camera);
     }
+    
 
     animate();
 
-    // Eventos de botão
+    function mostrarInstrucoes() {
+        const instructionText = document.getElementById('instructionText');
+        instructionText.style.display = 'block';
+    }
+    
+    function esconderInstrucoes() {
+        const instructionText = document.getElementById('instructionText');
+        instructionText.style.display = 'none';
+    }
+
+
     document.getElementById('downloadButton').addEventListener('click', () => {
-        renderer.render(scene, camera); // Renderiza a cena atual
+        
+        renderer.setClearColor(0x000000); 
+        renderer.render(scene, camera);
+
         const dataURL = renderer.domElement.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'mapa_estelar.png';
-        link.click();
+    
+        const tempCanvas = document.createElement('canvas');
+        const scaleFactor = 4; 
+        tempCanvas.width = renderer.domElement.width * scaleFactor;
+        tempCanvas.height = renderer.domElement.height * scaleFactor;
+
+        const ctx = tempCanvas.getContext('2d');
+        
+        const img = new Image();
+        img.onload = function() {
+            
+            ctx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            ctx.font = `${30 * scaleFactor}px Orbitron`; 
+            ctx.fillStyle = 'white'; 
+            ctx.textAlign = 'center'; 
+            ctx.fillText('ConstelArt', tempCanvas.width / 2, 100 * scaleFactor); 
+            
+            const finalDataURL = tempCanvas.toDataURL('image/png');
+            
+            const link = document.createElement('a');
+            link.href = finalDataURL;
+            link.download = 'mapa_estelar.png';
+            link.click();
+        };
+        
+        img.src = dataURL;
     });
+
+
+
 
     document.getElementById('backButton').addEventListener('click', () => {
         window.history.back();

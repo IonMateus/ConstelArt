@@ -1,37 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Estelar 3D</title>
+    <title>ConstelArt - 3D Map</title>
     <link rel="stylesheet" href="../styles/map.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="infoPanel">
-        <h3>Informações da Estrela</h3>
-        <div id="starInfo">Selecione uma estrela para ver os detalhes.</div>
+        <h3>ExoPlanet Information</h3>
+        <div id="starInfo">Select a star to see the details.</div>
     </div>
     <div id="leftPanel">
-        <button id="backButton">Voltar</button>
-        <button id="downloadButton">Download</button>
+        <button id="backButton">
+            <img src="../assets/images/back.png" alt="">
+        </button>
+        <button id="downloadButton">
+            <img src="../assets/images/download.png" alt="">
+        </button>
         <button id="addConstellationButton">+</button>
 
-        <!-- Novo elemento para exibir a constelação selecionada -->
+        <!-- New element to display the selected constellation -->
         <div id="selectedConstellation">
-            <h4>Constelação Selecionada:</h4>
-            <p id="constellationName">Nenhuma selecionada</p>
+            <h4>Selected Constellation:</h4>
+            <p id="constellationName">None selected</p>
         </div>
 
         <div id="constellationsList">
-            <h4>Constelações</h4>
+            <h4>Constellations</h4>
             <ul id="constellationItems">
-                <!-- Constelações serão adicionadas aqui dinamicamente -->
+                <!-- Constellations will be added here dynamically -->
             </ul>
         </div>
     </div>
 
-    <button id="togglePanelsButton" title="Esconder/Mostrar Painéis">☰</button>
+    <!-- New element for instructions -->
+    <div id="instructionText" class="hidden">Click on another ExoPlanet to form the constellation</div>
+
+    <button id="togglePanelsButton" title="Hide/Show Panels">☰</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="../scripts/Estrela.js"></script> 

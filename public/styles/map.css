@@ -27,7 +27,10 @@ body {
 }
 
 button {
-    padding: 10px 20px;
+    display: flex; /* Use Flexbox */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    padding: 10px 10px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid #fff;
     color: #fff;
@@ -37,8 +40,15 @@ button {
     transition: background 0.3s, color 0.3s;
 }
 
+button img {
+    max-width: 100%; /* Ensure the image doesn't overflow */
+    max-height: 100%; /* Ensure the image doesn't overflow */
+    display: block; /* Set the image to block for better control */
+}
+
+
 button:hover {
-    background: #fff;
+    background: #ffffff73;
     color: #000;
 }
 
@@ -197,3 +207,27 @@ button:hover {
         -webkit-touch-callout: none; /* Previne o menu de contexto no toque */
     }
 }
+
+
+
+/* Outros estilos existentes */
+
+/* Estilo para o texto de instruções */
+#instructionText {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    text-align: center;
+    display: none; /* Inicialmente escondido */
+    z-index: 1000;
+}
+
+.hidden {
+    display: none;
+}
+
