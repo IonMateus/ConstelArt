@@ -36,6 +36,18 @@
         </div>
     </div>
 
+    <div id="alert">
+        <p id="alertP">Alert!</p>
+        <button onclick="fecharAlerta()">OK</button>
+    </div>    
+
+    <script>
+        function fecharAlerta() {
+            const alertElement = document.getElementById('alert');
+            alertElement.style.display = 'none'; // Oculta o alerta
+        }   
+    </script>
+
     <!-- New element for instructions -->
     <div id="instructionText" class="hidden">Click on another ExoPlanet to form the constellation</div>
 

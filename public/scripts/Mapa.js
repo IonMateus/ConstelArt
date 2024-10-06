@@ -330,11 +330,22 @@ carregarEstrelas().then(() => {
             <strong>Tamanho:</strong> ${tamanho}<br>
         `;
     }
+    
+    function fecharAlerta() {
+        const alertElement = document.getElementById('alert');
+        alertElement.style.display = 'none'; // Oculta o alerta
+    }   
 
+    function mostrarAlerta(text) {
+        const alertElement = document.getElementById('alert');
+        alertElement.style.display = 'block'; 
+        document.getElementById("alertP").innerText = text
+        // Oculta o alerta
+    }   
 
     function desenharLinha(estrela1, estrela2) {
         if (!currentConstellation) {
-            alert("Por favor, selecione ou crie uma constelação para associar a linha.");
+            mostrarAlerta("First, select or create a constellation!")
             return;
         }
     

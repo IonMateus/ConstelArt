@@ -231,3 +231,41 @@ button:hover {
     display: none;
 }
 
+
+
+#alert {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid white;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro e semi-transparente */
+    color: white; /* Cor do texto */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Sombra suave */
+    z-index: 1000; /* Certifique-se de que o alerta está acima de outros elementos */
+    max-width: 400px; /* Largura máxima do alerta */
+    width: 80%; /* Largura relativa */
+}
+
+#alert p {
+    margin: 0; /* Remove margem padrão do parágrafo */
+    padding: 0; /* Remove padding do parágrafo */
+    margin-bottom: 15px; /* Espaçamento inferior */
+}
+
+#alert button {
+    color: white; /* Cor do texto do botão */
+    border: none; /* Sem borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 10px 15px; /* Espaçamento interno */
+    cursor: pointer; /* Mão ao passar o mouse */
+    float: right; /* Alinha o botão à direita */
+    transition: background-color 0.3s; /* Efeito de transição */
+}
+
+#alert button:hover {
+    background-color: #ffffff50; /* Cor do botão ao passar o mouse */
+}
