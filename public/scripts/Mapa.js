@@ -193,7 +193,7 @@ function selecionarConstelacao(constelacao) {
 }
 // Função para editar o nome da constelação
 function editarConstelacaoNome(constelacao, spanElement) {
-    const novoNome = prompt("Digite o novo nome da constelação:", constelacao.name);
+    const novoNome = prompt("Enter the new name for the constellation:", constelacao.name);
     if (novoNome && novoNome.trim() !== "") {
         constelacao.name = novoNome.trim();
         spanElement.textContent = constelacao.name;
@@ -202,7 +202,7 @@ function editarConstelacaoNome(constelacao, spanElement) {
 
 // Função para criar uma nova constelação via UI
 function handleAddConstellation() {
-    const nome = prompt("Digite o nome da nova constelação:");
+    const nome = prompt("Enter the name of the new constellation:");
     if (nome && nome.trim() !== "") {
         criarConstelacao(nome.trim());
     }
@@ -326,8 +326,8 @@ carregarEstrelas().then(() => {
         const tamanho = parseFloat(estrela.tamanho);
 
         infoPanel.innerHTML = `
-            <strong>Posição:</strong> (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})<br>
-            <strong>Tamanho:</strong> ${tamanho}<br>
+            <strong>Position:</strong> (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})<br>
+            <strong>Size:</strong> ${tamanho}<br>
         `;
     }
     
