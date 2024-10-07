@@ -188,7 +188,7 @@ function selecionarConstelacao(constelacao) {
         constellationNameElement.textContent = constelacao.name;
         adicionarTextoConstelacao(constelacao); 
     } else {
-        constellationNameElement.textContent = 'Nenhuma selecionada';
+        constellationNameElement.textContent = 'None selected';
     }
 }
 // Função para editar o nome da constelação
@@ -221,13 +221,13 @@ function togglePanels() {
         infoPanel.style.display = 'block';
         leftPanel.style.display = 'flex'; // Flex para manter a direção definida
         toggleButton.textContent = '☰'; // Ícone para esconder
-        toggleButton.title = 'Esconder Painéis';
+        toggleButton.title = 'Hide Panels';
     } else {
         // Esconder os painéis
         infoPanel.style.display = 'none';
         leftPanel.style.display = 'none';
         toggleButton.textContent = '☰'; // Você pode mudar o ícone se preferir
-        toggleButton.title = 'Mostrar Painéis';
+        toggleButton.title = 'Show Panels';
     }
 }
 
